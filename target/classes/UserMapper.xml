@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<mapper namespace="com.wjw.dao.UserMapper">
+    <select id="getUserById" resultType="com.wjw.pojo.User">
+        SELECT * FROM a_student WHERE id=?
+    </select>
+</mapper>
