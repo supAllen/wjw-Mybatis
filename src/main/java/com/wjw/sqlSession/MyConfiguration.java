@@ -16,7 +16,7 @@ import java.util.List;
 
 /**
  * @Author: Allen
- * @Description:    解析配置文件类，以及获取连接
+ * @Description: 解析配置文件类，以及获取连接
  * @Date: Created in 16:25 2018/5/16
  * @Modify By:
  */
@@ -25,6 +25,7 @@ public class MyConfiguration {
 
     /**
      * 获取Connection
+     *
      * @param resource
      * @return
      * @throws DocumentException
@@ -40,36 +41,46 @@ public class MyConfiguration {
 
     /**
      * 解析配置文件
+     *
      * @param root
      * @return
      * @throws ClassNotFoundException
      */
     public Connection evalDataSource(Element root) throws ClassNotFoundException {
-        if (!root.getName().equals("database")){
+        if (!root.getName().equals("database")) {
             throw new RuntimeException("root should be database");
         }
-        String driverClass=null;
-        String url=null;
-        String username=null;
-        String password=null;
-        for (Object m : root.elements("property")){
+        String driverClass = null;
+        String url = null;
+        String username = null;
+        String password = null;
+        for (Object m : root.elements("property")) {
             Element e = (Element) m;
             String value = getValue(e);
-            if (value == null)  throw new NullPointerException("property value is null");
+            if (value == null) throw new NullPointerException("property value is null");
             String name = e.attributeValue("name");
-            switch (name){
-                case "url": url=value; break;
-                case "driverClassName":driverClass=value; break;
-                case "username": username=value; break;
-                case "password": password=value; break;
-                default: throw new RuntimeException("property unknown name");
+            switch (name) {
+                case "url":
+                    url = value;
+                    break;
+                case "driverClassName":
+                    driverClass = value;
+                    break;
+                case "username":
+                    username = value;
+                    break;
+                case "password":
+                    password = value;
+                    break;
+                default:
+                    throw new RuntimeException("property unknown name");
             }
         }
 
         Class.forName(driverClass);
         Connection conn = null;
         try {
-            conn = DriverManager.getConnection(url,username,password);
+            conn = DriverManager.getConnection(url, username, password);
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -78,6 +89,7 @@ public class MyConfiguration {
 
     /**
      * 获取property属性值，如果有value值就读取，没有就获取其内容
+     *
      * @param node
      * @return
      */
@@ -87,6 +99,7 @@ public class MyConfiguration {
 
     /**
      * 解析每个sql
+     *
      * @param path
      * @return
      * @throws DocumentException
@@ -100,7 +113,7 @@ public class MyConfiguration {
             Element root = document.getRootElement();
             mapperBean.setInterfaceName(root.attributeValue("namespace").trim());
             List<Function> list = new ArrayList<>();        // 接口集合
-            for (Object element: root.elements()){
+            for (Object element : root.elements()) {
                 Function function = new Function();     // 存储每一个方法的信息
                 Element e = (Element) element;
                 String sqlType = e.getName().trim();
@@ -124,5 +137,19 @@ public class MyConfiguration {
             e1.printStackTrace();
         }
         return mapperBean;
+    }
+
+    /**
+     * 获取数据库连接
+     *
+     * @return
+     */
+    public Connection getConnection() {
+        try {
+            return this.build("config.xml");
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 }
